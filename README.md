@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Perpustakaan E-Book</title>
+  <title>Perpustakaan Digital E-Book</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,6 +15,14 @@
       color: white;
       padding: 15px;
       text-align: center;
+    }
+    .upload-section {
+      background: white;
+      padding: 15px;
+      margin: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .container {
       display: grid;
@@ -32,13 +40,6 @@
     }
     .book:hover {
       transform: scale(1.05);
-    }
-    .book img {
-      width: 100px;
-      height: 150px;
-      object-fit: cover;
-      margin-bottom: 10px;
-      border-radius: 8px;
     }
     .book h3 {
       font-size: 18px;
@@ -62,24 +63,30 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.8);
       justify-content: center;
       align-items: center;
     }
     .modal-content {
       background: white;
-      padding: 20px;
-      width: 80%;
-      height: 80%;
-      overflow-y: auto;
+      padding: 10px;
+      width: 90%;
+      height: 90%;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-content iframe {
+      flex: 1;
+      border: none;
+      border-radius: 8px;
     }
     .close {
-      float: right;
+      align-self: flex-end;
       font-size: 20px;
       cursor: pointer;
       color: red;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -87,58 +94,65 @@
   <header>
     <h1>📚 Perpustakaan Digital - E-Book</h1>
   </header>
-  
-  <div class="container">
-    <div class="book">
-      <img src="https://via.placeholder.com/100x150" alt="Buku 1">
-      <h3>Buku Pemrograman</h3>
-      <button onclick="openBook('pemrograman')">Baca</button>
-    </div>
-    <div class="book">
-      <img src="https://via.placeholder.com/100x150" alt="Buku 2">
-      <h3>Buku Sejarah</h3>
-      <button onclick="openBook('sejarah')">Baca</button>
-    </div>
-    <div class="book">
-      <img src="https://via.placeholder.com/100x150" alt="Buku 3">
-      <h3>Buku Fiksi</h3>
-      <button onclick="openBook('fiksi')">Baca</button>
-    </div>
+
+  <!-- Upload Buku -->
+  <div class="upload-section">
+    <input type="file" id="upload" accept="application/pdf">
+    <button onclick="addBook()">Tambah Buku</button>
   </div>
-  
-  <!-- Modal E-Book -->
+
+  <!-- Daftar Buku -->
+  <div class="container" id="bookList"></div>
+
+  <!-- Modal PDF Reader -->
   <div class="modal" id="ebookModal">
     <div class="modal-content">
       <span class="close" onclick="closeBook()">&times;</span>
-      <h2 id="bookTitle"></h2>
-      <p id="bookContent"></p>
+      <iframe id="pdfViewer"></iframe>
     </div>
   </div>
 
   <script>
-    const books = {
-      pemrograman: {
-        title: "Dasar-Dasar Pemrograman",
-        content: "Isi buku ini membahas tentang logika pemrograman, algoritma, dan dasar bahasa pemrograman..."
-      },
-      sejarah: {
-        title: "Sejarah Dunia",
-        content: "Buku ini menceritakan perjalanan peradaban manusia dari zaman kuno hingga modern..."
-      },
-      fiksi: {
-        title: "Cerita Fiksi Fantasi",
-        content: "Kisah petualangan seorang anak muda yang menemukan dunia lain penuh keajaiban..."
-      }
-    };
+    let books = [];
 
-    function openBook(bookKey) {
+    function addBook() {
+      const fileInput = document.getElementById('upload');
+      const file = fileInput.files[0];
+
+      if (file) {
+        const url = URL.createObjectURL(file);
+        const book = {
+          title: file.name,
+          url: url
+        };
+        books.push(book);
+        renderBooks();
+      } else {
+        alert("Pilih file PDF terlebih dahulu!");
+      }
+    }
+
+    function renderBooks() {
+      const list = document.getElementById('bookList');
+      list.innerHTML = "";
+      books.forEach((book, index) => {
+        list.innerHTML += `
+          <div class="book">
+            <h3>${book.title}</h3>
+            <button onclick="openBook(${index})">Baca</button>
+          </div>
+        `;
+      });
+    }
+
+    function openBook(index) {
       document.getElementById("ebookModal").style.display = "flex";
-      document.getElementById("bookTitle").innerText = books[bookKey].title;
-      document.getElementById("bookContent").innerText = books[bookKey].content;
+      document.getElementById("pdfViewer").src = books[index].url;
     }
 
     function closeBook() {
       document.getElementById("ebookModal").style.display = "none";
+      document.getElementById("pdfViewer").src = "";
     }
   </script>
 </body>
