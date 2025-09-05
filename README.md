@@ -1,159 +1,174 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Perpustakaan Digital E-Book</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1f2937;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    .upload-section {
-      background: white;
-      padding: 15px;
-      margin: 20px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .book {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      padding: 15px;
-      text-align: center;
-      transition: transform 0.2s;
-    }
-    .book:hover {
-      transform: scale(1.05);
-    }
-    .book h3 {
-      font-size: 18px;
-      margin: 10px 0;
-    }
-    .book button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .book button:hover {
-      background: #1d4ed8;
-    }
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 10px;
-      width: 90%;
-      height: 90%;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-content iframe {
-      flex: 1;
-      border: none;
-      border-radius: 8px;
-    }
-    .close {
-      align-self: flex-end;
-      font-size: 20px;
-      cursor: pointer;
-      color: red;
-      margin-bottom: 8px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pencatatan Buku</title>
+    <!-- CSS dasar (bisa diganti dengan Tailwind/Bootstrap) -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #508bff;
+            color: white;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: 3px solid #3D71C9;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            overflow: hidden;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        /* Style untuk form */
+        form {
+            padding: 15px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        form input[type="text"],
+        form input[type="number"],
+        form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        form button {
+            background-color: #508bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        /* Style untuk tabel */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #508bff;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>📚 Perpustakaan Digital - E-Book</h1>
-  </header>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><span class="highlight">Catatan</span> Buku</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="login.html">Login</a></li>
+                    <li><a href="daftar.html">Daftar</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-  <!-- Upload Buku -->
-  <div class="upload-section">
-    <input type="file" id="upload" accept="application/pdf">
-    <button onclick="addBook()">Tambah Buku</button>
-  </div>
+    <div class="container">
+        <h2>Form Input Data Buku</h2>
+        <form id="bookForm">
+            <label for="judul">Judul Buku:</label>
+            <input type="text" id="judul" name="judul" required>
 
-  <!-- Daftar Buku -->
-  <div class="container" id="bookList"></div>
+            <label for="penulis">Penulis:</label>
+            <input type="text" id="penulis" name="penulis" required>
 
-  <!-- Modal PDF Reader -->
-  <div class="modal" id="ebookModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeBook()">&times;</span>
-      <iframe id="pdfViewer"></iframe>
+            <label for="tahun">Tahun Terbit:</label>
+            <input type="number" id="tahun" name="tahun" required>
+
+            <label for="kategori">Kategori:</label>
+            <input type="text" id="kategori" name="kategori" required>
+
+            <button type="submit">Simpan</button>
+        </form>
+
+        <h2>Daftar Buku</h2>
+        <table id="bookTable">
+            <thead>
+                <tr>
+                    <th>Judul</th>
+                    <th>Penulis</th>
+                    <th>Tahun Terbit</th>
+                    <th>Kategori</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data buku akan ditampilkan di sini -->
+            </tbody>
+        </table>
     </div>
-  </div>
 
-  <script>
-    let books = [];
+    <!-- JavaScript dasar -->
+    <script>
+        document.getElementById('bookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-    function addBook() {
-      const fileInput = document.getElementById('upload');
-      const file = fileInput.files[0];
+            const judul = document.getElementById('judul').value;
+            const penulis = document.getElementById('penulis').value;
+            const tahun = document.getElementById('tahun').value;
+            const kategori = document.getElementById('kategori').value;
 
-      if (file) {
-        const url = URL.createObjectURL(file);
-        const book = {
-          title: file.name,
-          url: url
-        };
-        books.push(book);
-        renderBooks();
-      } else {
-        alert("Pilih file PDF terlebih dahulu!");
-      }
-    }
+            // Tambahkan data ke tabel
+            const table = document.getElementById('bookTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow(table.rows.length);
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
 
-    function renderBooks() {
-      const list = document.getElementById('bookList');
-      list.innerHTML = "";
-      books.forEach((book, index) => {
-        list.innerHTML += `
-          <div class="book">
-            <h3>${book.title}</h3>
-            <button onclick="openBook(${index})">Baca</button>
-          </div>
-        `;
-      });
-    }
+            cell1.innerHTML = judul;
+            cell2.innerHTML = penulis;
+            cell3.innerHTML = tahun;
+            cell4.innerHTML = kategori;
 
-    function openBook(index) {
-      document.getElementById("ebookModal").style.display = "flex";
-      document.getElementById("pdfViewer").src = books[index].url;
-    }
-
-    function closeBook() {
-      document.getElementById("ebookModal").style.display = "none";
-      document.getElementById("pdfViewer").src = "";
-    }
-  </script>
+            // Reset form
+            document.getElementById('bookForm').reset();
+        });
+    </script>
 </body>
 </html>
